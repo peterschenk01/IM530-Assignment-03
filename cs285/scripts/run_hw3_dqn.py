@@ -106,14 +106,14 @@ def run_training_loop(config: dict, logger: Logger, args: argparse.Namespace):
             replay_buffer.insert(action=action,
                                  reward=reward,
                                  next_observation=next_observation,
-                                 done=done)
+                                 done=done and not truncated)
         else:
             # We're using the regular replay buffer
             replay_buffer.insert(observation=observation, 
                                  action=action, 
                                  reward=reward, 
                                  next_observation=next_observation, 
-                                 done=done)
+                                 done=done and not truncated)
 
         # Handle episode termination
         if done:
