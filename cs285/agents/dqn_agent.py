@@ -75,14 +75,14 @@ class DQNAgent(nn.Module):
             if self.use_double_q:
                 raise NotImplementedError
             else:
-                next_action = torch.argmax(next_qa_values, dim=1)
+                next_action = torch.argmax(next_qa_values, dim=1).unsqueeze(1)
             
-            next_q_values = next_qa_values.gather(1, next_action)
-            target_values = reward + self.discount * next_q_values * (1.0 - done)
+            next_q_values = next_qa_values.gather(dim=1, index=next_action)
+            target_values = reward.unsqueeze(1) + self.discount * next_q_values * torch.logical_not(done.unsqueeze(1))
 
         # TODO(student): train the critic with the target values
         qa_values = self.critic(obs)
-        q_values = qa_values.gather(1, action) # Compute from the data actions; see torch.gather
+        q_values = qa_values.gather(dim=1, index=action.unsqueeze(1)) # Compute from the data actions; see torch.gather
         loss = self.critic_loss(q_values, target_values)
 
 
